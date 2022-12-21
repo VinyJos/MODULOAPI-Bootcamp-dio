@@ -23,7 +23,7 @@ namespace MODULOAPI.Controllers
         {
             _context.Add(contato);
             _context.SaveChanges();
-            return Ok(contato);
+            return CreatedAtAction(nameof(ObterPorId), new{id = contato.Id}, contato);
         }
 
         // Buscar Contato salvo
@@ -39,7 +39,14 @@ namespace MODULOAPI.Controllers
             }
             return Ok(contato);
         }
-        
+
+        // Obter por nome
+        [HttpGet("ObterPorNome")]
+        public IActionResult ObterPorNome(string nome)
+        {
+            var contatos = _context.Contatos.Where(x => x.Nome.Contains(nome));
+            return Ok(contatos);
+        }
         // Atualizar contato salvo
         [HttpPut("{id}")]
         public IActionResult Atualizar(int id, Contato contato)
@@ -60,6 +67,21 @@ namespace MODULOAPI.Controllers
             _context.SaveChanges();
 
             return Ok(contatoBanco);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Deletar(int id)
+        {
+            // vai buscar no banco
+            var contatoBanco = _context.Contatos.Find(id);
+
+            if(contatoBanco == null)
+                return NotFound();
+
+            _context.Contatos.Remove(contatoBanco);
+            _context.SaveChanges();
+            // retorno de sucesso, não tem nada para retornar
+            return NoContent();
         }
     }
 }
